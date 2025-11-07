@@ -32,6 +32,32 @@
                         :active="request()->routeIs('*.dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+
+                    {{-- LINKS DO ALUNO --}}
+                    @if(Auth::user()->user_type === 'aluno')
+                        <x-nav-link :href="route('vagas.index')" :active="request()->routeIs('vagas.*')">
+                            {{ __('Vagas Disponíveis') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('candidaturas.index')" :active="request()->routeIs('candidaturas.index')">
+                            {{ __('As Minhas Candidaturas') }}
+                        </x-nav-link>
+                    @endif
+
+                    {{-- LINKS DA EMPRESA --}}
+                    @if(Auth::user()->user_type === 'empresa')
+                        <x-nav-link :href="route('vagas.index')" :active="request()->routeIs('vagas.index')">
+                            {{ __('Minhas Vagas') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('vagas.create')" :active="request()->routeIs('vagas.create')">
+                            {{ __('Criar Nova Vaga') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('empresa.candidaturas.index')" :active="request()->routeIs('empresa.candidaturas.index')">
+                            {{ __('Candidaturas Recebidas') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -102,6 +128,16 @@
                 :active="request()->routeIs('*.dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+
+            @if(Auth::user()->user_type === 'aluno')
+                <x-responsive-nav-link :href="route('vagas.index')" :active="request()->routeIs('vagas.*')">
+                    {{ __('Vagas Disponíveis') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('candidaturas.index')" :active="request()->routeIs('candidaturas.index')">
+                    {{ __('As Minhas Candidaturas') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->
@@ -112,7 +148,6 @@
             </div>
 
             <div class="mt-3 space-y-1">
-                <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <x-responsive-nav-link :href="route('logout')"
