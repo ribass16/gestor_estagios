@@ -63,4 +63,37 @@ class VagaController extends Controller
         $vaga->delete();
         return redirect()->route('vagas.index')->with('success', 'Vaga eliminada com sucesso.');
     }
+
+    public function edit($id)
+    {
+        $vaga = Vaga::findOrFail($id);
+
+        // Garante que apenas a empresa dona da vaga pode editar
+        if (Auth::user()->user_type !== 'empresa' || Auth::id() !== $vaga->empresa_id) {
+            abort(403, 'Acesso negado.');
+        }
+
+        return view('vagas.edit', compact('vaga'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $vaga = Vaga::findOrFail($id);
+
+        if (Auth::user()->user_type !== 'empresa' || Auth::id() !== $vaga->empresa_id) {
+            abort(403, 'Acesso negado.');
+        }
+
+        $request->validate([
+            'titulo' => 'required|string|max:255',
+            'descricao' => 'required|string',
+        ]);
+
+        $vaga->update([
+            'titulo' => $request->titulo,
+            'descricao' => $request->descricao,
+        ]);
+
+        return redirect()->route('vagas.index')->with('success', 'Vaga atualizada com sucesso!');
+    }
 }
