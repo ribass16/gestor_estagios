@@ -40,8 +40,12 @@
                         <tbody class="divide-y divide-gray-700">
                             @foreach ($candidaturas as $candidatura)
                                 <tr>
-                                    <td class="px-6 py-4 font-medium text-gray-200">
-                                        {{ $candidatura->aluno->name }}
+                                    <td class="px-6 py-4">
+                                        @if($candidatura->aluno && $candidatura->aluno->user)
+                                            {{ $candidatura->aluno->user->name }}
+                                        @else
+                                            <span class="text-gray-400 italic">Aluno não associado</span>
+                                        @endif
                                     </td>
 
                                     <td class="px-6 py-4">

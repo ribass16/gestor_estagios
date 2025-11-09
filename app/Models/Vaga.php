@@ -25,7 +25,8 @@ class Vaga extends Model
 
     public function empresa()
     {
-        return $this->belongsTo(\App\Models\User::class, 'empresa_id');
+        return $this->belongsTo(Empresa::class);
     }
+
 
 }

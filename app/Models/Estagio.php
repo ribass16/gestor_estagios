@@ -2,14 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Estagio extends Model
 {
-    use HasFactory;
-
-    protected $fillable = [
+     protected $fillable = [
+        'candidatura_id',
         'aluno_id',
         'empresa_id',
         'orientador_id',
@@ -20,6 +18,15 @@ class Estagio extends Model
         'estado',
     ];
 
+
+    public function candidatura()
+    {
+        return $this->belongsTo(Candidatura::class);
+    }
+    public function orientador()
+    {
+        return $this->belongsTo(Orientador::class);
+    }
     public function aluno()
     {
         return $this->belongsTo(Aluno::class);
@@ -30,8 +37,5 @@ class Estagio extends Model
         return $this->belongsTo(Empresa::class);
     }
 
-    public function orientador()
-    {
-        return $this->belongsTo(Orientador::class);
-    }
+
 }

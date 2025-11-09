@@ -43,8 +43,6 @@ class Kernel extends HttpKernel
 
     /**
      * The application's route middleware.
-     *
-     * These middleware may be assigned to groups or used individually.
      */
     protected $routeMiddleware = [
         'auth' => \App\Http\Middleware\Authenticate::class,
@@ -56,8 +54,5 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-
-        // 👇 aqui adiciona o nosso middleware personalizado
-        'user_type' => \App\Http\Middleware\UserTypeMiddleware::class,
     ];
 }

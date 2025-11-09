@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Candidatura;
+use App\Models\Empresa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,31 +13,53 @@ class EmpresaCandidaturaController extends Controller
     {
         $user = Auth::user();
 
-        // Vê todas as candidaturas ligadas às vagas da empresa autenticada
-        $candidaturas = Candidatura::whereHas('vaga', function ($query) use ($user) {
-            $query->where('empresa_id', $user->id);
-        })->with(['aluno', 'vaga'])->get();
+        // Empresa ligada ao utilizador autenticado
+        $empresa = Empresa::where('user_id', $user->id)->first();
+
+        if (!$empresa) {
+            abort(403, 'Empresa não encontrada para este utilizador.');
+        }
+
+        $candidaturas = Candidatura::with(['vaga', 'aluno.user'])
+            ->whereHas('vaga', function ($q) use ($empresa) {
+                // AGORA sim: vagas.empresa_id = empresas.id
+                $q->where('empresa_id', $empresa->id);
+            })
+            ->get();
 
         return view('empresa.candidaturas.index', compact('candidaturas'));
     }
 
-    // Aceitar candidatura
     public function aceitar($id)
     {
-        $candidatura = Candidatura::findOrFail($id);
+        $empresa = Empresa::where('user_id', Auth::id())->firstOrFail();
+
+        $candidatura = Candidatura::with('vaga')->findOrFail($id);
+
+        // segurança: só a empresa dona da vaga pode mexer
+        if (!$candidatura->vaga || $candidatura->vaga->empresa_id !== $empresa->id) {
+            abort(403, 'Não podes alterar esta candidatura.');
+        }
+
         $candidatura->estado = 'aceite';
         $candidatura->save();
 
-        return redirect()->back()->with('success', 'Candidatura aceite com sucesso!');
+        return back()->with('success', 'Candidatura marcada como aceite. Aguarda a escolha do orientador pelo aluno.');
     }
 
-    // Recusar candidatura
     public function recusar($id)
     {
-        $candidatura = Candidatura::findOrFail($id);
+        $empresa = Empresa::where('user_id', Auth::id())->firstOrFail();
+
+        $candidatura = Candidatura::with('vaga')->findOrFail($id);
+
+        if (!$candidatura->vaga || $candidatura->vaga->empresa_id !== $empresa->id) {
+            abort(403, 'Não podes alterar esta candidatura.');
+        }
+
         $candidatura->estado = 'recusada';
         $candidatura->save();
 
-        return redirect()->back()->with('error', 'Candidatura recusada.');
+        return back()->with('success', 'Candidatura recusada.');
     }
 }

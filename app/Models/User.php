@@ -22,18 +22,25 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    // app/Models/User.php
+
     public function empresa()
     {
-        return $this->hasOne(Empresa::class);
+        return $this->hasOne(\App\Models\Empresa::class);
     }
+
 
     public function aluno()
     {
-        return $this->hasOne(Aluno::class);
+        return $this->hasOne(\App\Models\Aluno::class);
     }
 
     public function orientador()
     {
-        return $this->hasOne(Orientador::class);
+        return $this->hasOne(\App\Models\Orientador::class);
     }
+
+
+
+
 }

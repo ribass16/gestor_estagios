@@ -10,26 +10,29 @@ class Candidatura extends Model
     use HasFactory;
 
     protected $fillable = [
-        'aluno_id',
         'vaga_id',
-        'orientador_id',
+        'aluno_id',
         'estado',
     ];
 
     public function vaga()
     {
-        return $this->belongsTo(Vaga::class, 'vaga_id');
+        return $this->belongsTo(Vaga::class);
     }
 
     public function aluno()
     {
-        return $this->belongsTo(User::class, 'aluno_id');
+        return $this->belongsTo(Aluno::class);
     }
-
 
 
     public function orientador()
     {
         return $this->belongsTo(User::class, 'orientador_id');
+    }
+
+     public function estagio()
+    {
+        return $this->hasOne(Estagio::class);
     }
 }

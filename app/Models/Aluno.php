@@ -2,13 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Aluno extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'user_id',
         'curso',
@@ -20,4 +17,11 @@ class Aluno extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function candidaturas()
+    {
+        return $this->hasMany(Candidatura::class);
+    }
 }
+
+
