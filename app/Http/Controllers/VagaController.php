@@ -6,37 +6,27 @@ use App\Models\Vaga;
 use App\Models\Empresa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class VagaController extends Controller
 {
     /**
-     * Garante que o utilizador autenticado é uma empresa aprovada.
-     * Devolve o modelo Empresa ou lança 403 se algo não estiver correto.
+     * Garante que o user autenticado é uma empresa aprovada.
+     * Devolve o registo Empresa ou RedirectResponse se não puder avançar.
      */
-    private function ensureEmpresaAprovada(): Empresa
+    private function getEmpresaAprovadaOrRedirect()
     {
         $user = Auth::user();
-
-        if (!$user || $user->user_type !== 'empresa') {
-            throw new HttpException(403, 'Apenas empresas podem gerir vagas.');
-        }
 
         $empresa = Empresa::where('user_id', $user->id)->first();
 
         if (!$empresa) {
-            throw new HttpException(403, 'Registo de empresa não encontrado.');
+            abort(403, 'Empresa não encontrada.');
         }
 
-        // normaliza o estado para evitar problemas com espaços/maiúsculas
-        $estado = strtolower(trim((string) $empresa->estado));
-
-        // ajusta aqui ao valor REAL da BD: 'aprovada'
-        if ($estado !== 'aprovada') {
-            throw new HttpException(
-                403,
-                'A tua empresa ainda não foi aprovada. Só podes criar e gerir vagas depois da aprovação.'
-            );
+        if ($empresa->estado !== 'aprovado') {
+            return redirect()
+                ->route('empresa.dashboard')
+                ->with('error', 'A tua empresa ainda não foi aprovada. Só podes criar e gerir vagas depois da aprovação.');
         }
 
         return $empresa;
@@ -44,7 +34,7 @@ class VagaController extends Controller
 
     /**
      * Listagem de vagas:
-     * - Empresa → Minhas vagas (se aprovada; se não, mensagem)
+     * - Empresa → Minhas vagas (filtra por users.id)
      * - Admin   → Todas as vagas
      * - Outros  → Vagas abertas
      */
@@ -52,68 +42,68 @@ class VagaController extends Controller
     {
         $user = Auth::user();
 
-        // EMPRESA: "Minhas Vagas"
         if ($user && $user->user_type === 'empresa') {
             $empresa = Empresa::where('user_id', $user->id)->first();
 
             if (!$empresa) {
-                abort(403, 'Registo de empresa não encontrado.');
+                abort(403, 'Empresa não encontrada.');
             }
 
-            $estado = strtolower(trim((string) $empresa->estado));
-
-            // ainda não aprovada → não mostra vagas, só flag na view
-            if ($estado !== 'aprovada') {
+            if ($empresa->estado !== 'aprovado') {
                 $vagas = collect();
                 $pendente = true;
-
                 return view('empresa.vagas.index', compact('vagas', 'pendente'));
             }
 
-            // aprovada → listar vagas desta empresa
-            $vagas = Vaga::where('empresa_id', $empresa->id)->get();
+            // ATENÇÃO: empresa_id em vagas referencia users.id
+            $vagas = Vaga::where('empresa_id', $user->id)->orderByDesc('id')->get();
 
             return view('empresa.vagas.index', compact('vagas'));
         }
 
-        // ADMIN: todas as vagas
         if ($user && $user->user_type === 'admin') {
-            $vagas = Vaga::with('empresa')->get();
-
+            $vagas = Vaga::with('empresa')->orderByDesc('id')->get();
             return view('admin.vagas.index', compact('vagas'));
         }
 
-        // ALUNO / ORIENTADOR / GUEST: só vagas abertas
         $vagas = Vaga::with('empresa')
             ->where('estado', 'aberta')
+            ->orderByDesc('id')
             ->get();
 
         return view('vagas.index', compact('vagas'));
     }
 
     /**
-     * Formulário criar vaga (apenas empresa aprovada)
+     * Formulário criar vaga (empresa aprovada)
      */
     public function create()
     {
-        $this->ensureEmpresaAprovada();
+        $empresa = $this->getEmpresaAprovadaOrRedirect();
+        if ($empresa instanceof \Illuminate\Http\RedirectResponse) {
+            return $empresa;
+        }
 
         return view('vagas.create');
     }
 
     /**
-     * Guardar vaga (apenas empresa aprovada)
+     * Guardar vaga (empresa aprovada)
      */
     public function store(Request $request)
     {
-        $empresa = $this->ensureEmpresaAprovada();
+        $empresa = $this->getEmpresaAprovadaOrRedirect();
+        if ($empresa instanceof \Illuminate\Http\RedirectResponse) {
+            return $empresa;
+        }
 
         $data = $request->validate([
             'titulo'    => ['required', 'string', 'max:255'],
             'descricao' => ['required', 'string'],
         ]);
 
-        $data['empresa_id'] = $empresa->id; // FK para empresas.id
+        // >>> FK para users.id (dono da empresa)
+        $data['empresa_id'] = Auth::id();
         $data['estado']     = 'aberta';
 
         Vaga::create($data);
@@ -124,12 +114,11 @@ class VagaController extends Controller
     }
 
     /**
-     * Mostrar detalhes de uma vaga
+     * Mostrar detalhes de vaga
      */
     public function show(Vaga $vaga)
     {
         $vaga->load('empresa');
-
         return view('vagas.show', compact('vaga'));
     }
 
@@ -138,11 +127,15 @@ class VagaController extends Controller
      */
     public function edit($id)
     {
-        $empresa = $this->ensureEmpresaAprovada();
+        $empresa = $this->getEmpresaAprovadaOrRedirect();
+        if ($empresa instanceof \Illuminate\Http\RedirectResponse) {
+            return $empresa;
+        }
 
         $vaga = Vaga::findOrFail($id);
 
-        if ($vaga->empresa_id !== $empresa->id) {
+        // Dono é o user da empresa (FK para users.id)
+        if ($vaga->empresa_id !== Auth::id()) {
             abort(403, 'Acesso negado.');
         }
 
@@ -150,15 +143,18 @@ class VagaController extends Controller
     }
 
     /**
-     * Atualizar vaga (apenas empresa dona + aprovada)
+     * Atualizar vaga
      */
     public function update(Request $request, $id)
     {
-        $empresa = $this->ensureEmpresaAprovada();
+        $empresa = $this->getEmpresaAprovadaOrRedirect();
+        if ($empresa instanceof \Illuminate\Http\RedirectResponse) {
+            return $empresa;
+        }
 
         $vaga = Vaga::findOrFail($id);
 
-        if ($vaga->empresa_id !== $empresa->id) {
+        if ($vaga->empresa_id !== Auth::id()) {
             abort(403, 'Acesso negado.');
         }
 
@@ -175,13 +171,16 @@ class VagaController extends Controller
     }
 
     /**
-     * Apagar vaga (apenas empresa dona + aprovada)
+     * Apagar vaga
      */
     public function destroy(Vaga $vaga)
     {
-        $empresa = $this->ensureEmpresaAprovada();
+        $empresa = $this->getEmpresaAprovadaOrRedirect();
+        if ($empresa instanceof \Illuminate\Http\RedirectResponse) {
+            return $empresa;
+        }
 
-        if ($vaga->empresa_id !== $empresa->id) {
+        if ($vaga->empresa_id !== Auth::id()) {
             abort(403, 'Acesso negado.');
         }
 

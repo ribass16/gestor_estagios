@@ -9,7 +9,7 @@ use App\Models\Vaga;
 use App\Models\Estagio;
 use App\Models\Candidatura;
 
-class AdminController extends Controller
+class AdminDashboardController extends Controller
 {
     public function index()
     {

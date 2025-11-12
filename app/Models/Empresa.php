@@ -13,6 +13,7 @@ class Empresa extends Model
         'user_id',
         'nome',
         'nif',
+        'email_contacto',
         'telemovel',
         'morada',
         'website',
@@ -20,6 +21,11 @@ class Empresa extends Model
         'descricao',
         'aceita_estagios',
         'estado',
+
+        // novos campos do responsável
+        'responsavel_nome',
+        'responsavel_email',
+        'responsavel_telemovel',
     ];
 
     public function user()

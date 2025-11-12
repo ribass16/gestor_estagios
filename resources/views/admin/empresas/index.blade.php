@@ -1,132 +1,124 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Gestão de Empresas
-        </h2>
+        <h2 class="font-semibold text-xl text-gray-200 leading-tight">Empresas</h2>
     </x-slot>
 
-    <div class="py-8 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
+    <div class="py-8 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
         @if(session('status'))
-            <div class="p-3 bg-green-100 text-green-800 rounded">
+            <div class="bg-emerald-600/20 border border-emerald-600 text-emerald-200 px-4 py-2 rounded">
                 {{ session('status') }}
             </div>
         @endif
 
-        {{-- Cards com contagens --}}
+        {{-- Cards --}}
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div class="bg-white p-4 rounded-lg shadow text-center">
-                <div class="text-xs uppercase text-gray-500">Pendentes</div>
-                <div class="text-2xl font-semibold">{{ $pendentes->count() }}</div>
+            <div class="bg-gray-900 border border-gray-800 rounded-lg p-4 text-center">
+                <div class="text-xs uppercase text-gray-400">Pendentes</div>
+                <div class="text-2xl font-semibold text-white">{{ $pendentesCount }}</div>
             </div>
-            <div class="bg-white p-4 rounded-lg shadow text-center">
-                <div class="text-xs uppercase text-gray-500">Aprovadas</div>
-                <div class="text-2xl font-semibold">{{ $aprovadas->count() }}</div>
+            <div class="bg-gray-900 border border-gray-800 rounded-lg p-4 text-center">
+                <div class="text-xs uppercase text-gray-400">Aprovadas</div>
+                <div class="text-2xl font-semibold text-white">{{ $aprovadasCount }}</div>
             </div>
-            <div class="bg-white p-4 rounded-lg shadow text-center">
-                <div class="text-xs uppercase text-gray-500">Rejeitadas</div>
-                <div class="text-2xl font-semibold">{{ $rejeitadas->count() }}</div>
+            <div class="bg-gray-900 border border-gray-800 rounded-lg p-4 text-center">
+                <div class="text-xs uppercase text-gray-400">Rejeitadas</div>
+                <div class="text-2xl font-semibold text-white">{{ $rejeitadasCount }}</div>
             </div>
         </div>
 
-        {{-- Pendentes --}}
-        <div class="bg-white p-6 rounded-lg shadow">
-            <h3 class="font-semibold mb-3">Pendentes</h3>
-            @if($pendentes->isEmpty())
-                <p class="text-sm text-gray-500">Nenhuma empresa pendente.</p>
-            @else
-                <table class="min-w-full text-sm">
-                    <thead>
-                        <tr>
-                            <th class="px-3 py-2 text-left">Nome</th>
-                            <th class="px-3 py-2 text-left">Email</th>
-                            <th class="px-3 py-2 text-left">NIF</th>
-                            <th class="px-3 py-2 text-left">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($pendentes as $empresa)
-                            <tr class="border-t">
-                                <td class="px-3 py-2">{{ $empresa->nome }}</td>
-                                <td class="px-3 py-2">{{ $empresa->email }}</td>
-                                <td class="px-3 py-2">{{ $empresa->nif ?? '-' }}</td>
-                                <td class="px-3 py-2 space-x-2">
-                                    <form method="POST" action="{{ route('admin.empresas.aprovar', $empresa) }}" class="inline">
-                                        @csrf
-                                        <x-primary-button type="submit">Aprovar</x-primary-button>
-                                    </form>
+        {{-- Filtro + Novo --}}
+        <form method="GET"
+              class="bg-gray-900 border border-gray-800 rounded-lg p-4 flex items-center gap-3">
+            <input type="text" name="q" value="{{ $q }}"
+                   placeholder="Procurar por nome, email ou NIF…"
+                   class="w-full rounded-md bg-gray-800 border-gray-700 text-gray-200"/>
 
-                                    <form method="POST" action="{{ route('admin.empresas.rejeitar', $empresa) }}" class="inline">
+            <x-primary-button>Procurar</x-primary-button>
+
+            @if($q !== '')
+                <a href="{{ route('admin.empresas.index') }}" class="text-sm text-gray-300 underline">limpar</a>
+            @endif
+
+            <a href="{{ route('admin.empresas.create') }}"
+               class="ml-auto inline-flex items-center gap-2 px-4 py-2 rounded-md
+                      bg-indigo-600 text-white hover:bg-indigo-700">
+                <span class="text-lg leading-none">+</span>
+                <span>Novo</span>
+            </a>
+        </form>
+
+        {{-- Tabela --}}
+        <div class="bg-gray-900 border border-gray-800 rounded-lg overflow-hidden">
+            <table class="min-w-full text-sm text-gray-200">
+                <thead class="bg-gray-800 text-gray-300">
+                    <tr>
+                        <th class="px-4 py-2 text-left">Nome</th>
+                        <th class="px-4 py-2 text-left">Email</th>
+                        <th class="px-4 py-2 text-left">NIF</th>
+                        <th class="px-4 py-2 text-left">Estado</th>
+                        <th class="px-4 py-2 text-left">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-800">
+                    @forelse ($empresas as $e)
+                        <tr>
+                            <td class="px-4 py-2">{{ $e->nome }}</td>
+                            <td class="px-4 py-2">{{ $e->email }}</td>
+                            <td class="px-4 py-2">{{ $e->nif ?? '—' }}</td>
+                            <td class="px-4 py-2">
+                                @php
+                                    $badge = [
+                                        'pendente'  => 'bg-yellow-600',
+                                        'aprovada'  => 'bg-green-600',
+                                        'rejeitada' => 'bg-red-600',
+                                    ][$e->estado] ?? 'bg-gray-600';
+                                @endphp
+                                <span class="px-2 py-0.5 rounded text-xs text-white {{ $badge }}">
+                                    {{ ucfirst($e->estado) }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-2 space-x-2">
+                                @if($e->estado === 'pendente')
+                                    <form class="inline" method="POST" action="{{ route('admin.empresas.aprovar', $e) }}">
                                         @csrf
-                                        <button type="submit"
-                                                class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent
-                                                       rounded-md font-semibold text-xs text-white uppercase tracking-widest
-                                                       hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500
-                                                       focus:ring-offset-2 transition ease-in-out duration-150">
+                                        <button class="px-3 py-1 rounded bg-green-600 hover:bg-green-700 text-white text-xs">
+                                            Aprovar
+                                        </button>
+                                    </form>
+                                    <form class="inline" method="POST" action="{{ route('admin.empresas.rejeitar', $e) }}">
+                                        @csrf
+                                        <button class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white text-xs">
                                             Rejeitar
                                         </button>
                                     </form>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            @endif
-        </div>
+                                @endif
 
-        {{-- Aprovadas --}}
-        <div class="bg-white p-6 rounded-lg shadow">
-            <h3 class="font-semibold mb-3">Aprovadas</h3>
-            @if($aprovadas->isEmpty())
-                <p class="text-sm text-gray-500">Nenhuma empresa aprovada.</p>
-            @else
-                <table class="min-w-full text-sm">
-                    <thead>
-                        <tr>
-                            <th class="px-3 py-2 text-left">Nome</th>
-                            <th class="px-3 py-2 text-left">Email</th>
-                            <th class="px-3 py-2 text-left">NIF</th>
+                                <a href="{{ route('admin.empresas.edit', $e) }}"
+                                   class="px-3 py-1 rounded bg-indigo-600 hover:bg-indigo-700 text-white text-xs">
+                                    Editar
+                                </a>
+
+                                <form class="inline" method="POST"
+                                      action="{{ route('admin.empresas.destroy', $e) }}"
+                                      onsubmit="return confirm('Apagar esta empresa?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="px-3 py-1 rounded bg-gray-700 hover:bg-gray-800 text-white text-xs">
+                                        Apagar
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($aprovadas as $empresa)
-                            <tr class="border-t">
-                                <td class="px-3 py-2">{{ $empresa->nome }}</td>
-                                <td class="px-3 py-2">{{ $empresa->email }}</td>
-                                <td class="px-3 py-2">{{ $empresa->nif ?? '-' }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            @endif
+                    @empty
+                        <tr><td colspan="5" class="px-4 py-6 text-center text-gray-400">Sem registos.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
 
-        {{-- Rejeitadas --}}
-        <div class="bg-white p-6 rounded-lg shadow">
-            <h3 class="font-semibold mb-3">Rejeitadas</h3>
-            @if($rejeitadas->isEmpty())
-                <p class="text-sm text-gray-500">Nenhuma empresa rejeitada.</p>
-            @else
-                <table class="min-w-full text-sm">
-                    <thead>
-                        <tr>
-                            <th class="px-3 py-2 text-left">Nome</th>
-                            <th class="px-3 py-2 text-left">Email</th>
-                            <th class="px-3 py-2 text-left">NIF</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($rejeitadas as $empresa)
-                            <tr class="border-t">
-                                <td class="px-3 py-2">{{ $empresa->nome }}</td>
-                                <td class="px-3 py-2">{{ $empresa->email }}</td>
-                                <td class="px-3 py-2">{{ $empresa->nif ?? '-' }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            @endif
+        <div class="mt-4">
+            {{ $empresas->links() }}
         </div>
-
     </div>
 </x-app-layout>

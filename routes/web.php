@@ -52,22 +52,57 @@ Route::get('/vagas/{vaga}', [VagaController::class, 'show'])
     ->whereNumber('vaga');
 
 // ====================== ADMIN ======================
-
 Route::middleware(['auth', 'user_type:admin'])->group(function () {
-    Route::get('/admin', [AdminController::class, 'index'])->name('admin.dashboard');
+    Route::get('/admin', [\App\Http\Controllers\AdminDashboardController::class, 'index'])
+        ->name('admin.dashboard');
 
     // Empresas
-    Route::get('/admin/empresas', [AdminEmpresaController::class, 'index'])->name('admin.empresas.index');
-    Route::post('/admin/empresas/{empresa}/aprovar', [AdminEmpresaController::class, 'aprovar'])->name('admin.empresas.aprovar');
-    Route::post('/admin/empresas/{empresa}/rejeitar', [AdminEmpresaController::class, 'rejeitar'])->name('admin.empresas.rejeitar');
+    Route::get('/admin/empresas', [\App\Http\Controllers\AdminEmpresaController::class, 'index'])->name('admin.empresas.index');
+    Route::post('/admin/empresas/{empresa}/aprovar', [\App\Http\Controllers\AdminEmpresaController::class, 'aprovar'])->name('admin.empresas.aprovar');
+    Route::post('/admin/empresas/{empresa}/rejeitar', [\App\Http\Controllers\AdminEmpresaController::class, 'rejeitar'])->name('admin.empresas.rejeitar');
+    Route::get('/admin/empresas/export/csv', [\App\Http\Controllers\AdminEmpresaController::class, 'exportCsv'])->name('admin.empresas.export.csv');
+
+    Route::get('/admin/empresas', [\App\Http\Controllers\AdminEmpresaController::class, 'index'])->name('admin.empresas.index');
+    Route::get('/admin/empresas/create', [\App\Http\Controllers\AdminEmpresaController::class, 'create'])->name('admin.empresas.create');
+    Route::post('/admin/empresas', [\App\Http\Controllers\AdminEmpresaController::class, 'store'])->name('admin.empresas.store');
+    Route::get('/admin/empresas/{empresa}/edit', [\App\Http\Controllers\AdminEmpresaController::class, 'edit'])->name('admin.empresas.edit');
+    Route::put('/admin/empresas/{empresa}', [\App\Http\Controllers\AdminEmpresaController::class, 'update'])->name('admin.empresas.update');
+    Route::delete('/admin/empresas/{empresa}', [\App\Http\Controllers\AdminEmpresaController::class, 'destroy'])->name('admin.empresas.destroy');
+    Route::post('/admin/empresas/{empresa}/aprovar', [\App\Http\Controllers\AdminEmpresaController::class, 'aprovar'])->name('admin.empresas.aprovar');
+    Route::post('/admin/empresas/{empresa}/rejeitar', [\App\Http\Controllers\AdminEmpresaController::class, 'rejeitar'])->name('admin.empresas.rejeitar');
+
+
+    // Alunos (ex: só listagem e pesquisa – replica o padrão)
+    Route::get('/admin/alunos', [\App\Http\Controllers\AdminAlunoController::class, 'index'])->name('admin.alunos.index');
 
     // Orientadores
     Route::get('/admin/orientadores', [AdminOrientadorController::class, 'index'])->name('admin.orientadores.index');
     Route::get('/admin/orientadores/create', [AdminOrientadorController::class, 'create'])->name('admin.orientadores.create');
     Route::post('/admin/orientadores', [AdminOrientadorController::class, 'store'])->name('admin.orientadores.store');
+    Route::get('/admin/orientadores/{orientador}/edit', [AdminOrientadorController::class, 'edit'])->name('admin.orientadores.edit');
+    Route::put('/admin/orientadores/{orientador}', [AdminOrientadorController::class, 'update'])->name('admin.orientadores.update');
+    Route::delete('/admin/orientadores/{orientador}', [AdminOrientadorController::class, 'destroy'])->name('admin.orientadores.destroy');
+
     Route::post('/admin/orientadores/{orientador}/aprovar', [AdminOrientadorController::class, 'aprovar'])->name('admin.orientadores.aprovar');
     Route::post('/admin/orientadores/{orientador}/rejeitar', [AdminOrientadorController::class, 'rejeitar'])->name('admin.orientadores.rejeitar');
+
+
+    // Vagas
+    Route::get('/admin/vagas', [\App\Http\Controllers\AdminVagaController::class, 'index'])->name('admin.vagas.index');
+    Route::post('/admin/vagas/{vaga}/fechar', [\App\Http\Controllers\AdminVagaController::class, 'fechar'])->name('admin.vagas.fechar');
+    Route::post('/admin/vagas/{vaga}/abrir', [\App\Http\Controllers\AdminVagaController::class, 'abrir'])->name('admin.vagas.abrir');
+
+    // Candidaturas
+    Route::get('/admin/candidaturas', [\App\Http\Controllers\AdminCandidaturaController::class, 'index'])->name('admin.candidaturas.index');
+
+    // Estágios
+    Route::get('/admin/estagios', [\App\Http\Controllers\AdminEstagioController::class, 'index'])->name('admin.estagios.index');
+
+    // Impersonate (entrar como utilizador e voltar)
+    Route::post('/admin/impersonate/{user}', [\App\Http\Controllers\AdminUserController::class, 'impersonate'])->name('admin.impersonate');
+    Route::post('/admin/impersonate/stop', [\App\Http\Controllers\AdminUserController::class, 'stopImpersonate'])->name('admin.impersonate.stop');
 });
+
 
 // ====================== ALUNO ======================
 
@@ -108,7 +143,7 @@ Route::middleware(['auth', 'user_type:empresa'])->group(function () {
     Route::post('/empresa/candidaturas/{id}/aceitar', [EmpresaCandidaturaController::class, 'aceitar'])->name('empresa.candidaturas.aceitar');
     Route::post('/empresa/candidaturas/{id}/recusar', [EmpresaCandidaturaController::class, 'recusar'])->name('empresa.candidaturas.recusar');
 
-    
+
     // Perfil da Empresa
     Route::get('/empresa/perfil', [EmpresaController::class, 'perfil'])->name('empresa.perfil');
     Route::get('/empresa/perfil/editar', [EmpresaController::class, 'editarPerfil'])->name('empresa.perfil.editar');
