@@ -51,10 +51,11 @@ class CandidaturaController extends Controller
         }
 
         Candidatura::create([
-            'vaga_id'  => $vaga->id,
-            'aluno_id' => $aluno->id,
-            'estado'   => 'pendente',
+            'vaga_id' => $vaga->id,
+            'aluno_id' => $aluno->id, // tem de ser o ID da tabela alunos
+            'estado' => 'pendente',
         ]);
+
 
 
         return redirect()

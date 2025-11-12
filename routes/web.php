@@ -21,45 +21,35 @@ use App\Http\Controllers\AlunoOrientadorController;
 Route::get('/', function () {
     if (Auth::check()) {
         switch (Auth::user()->user_type) {
-            case 'admin':
-                return redirect()->route('admin.dashboard');
-            case 'aluno':
-                return redirect()->route('aluno.dashboard');
-            case 'empresa':
-                return redirect()->route('empresa.dashboard');
-            case 'orientador':
-                return redirect()->route('orientador.dashboard');
+            case 'admin': return redirect()->route('admin.dashboard');
+            case 'aluno': return redirect()->route('aluno.dashboard');
+            case 'empresa': return redirect()->route('empresa.dashboard');
+            case 'orientador': return redirect()->route('orientador.dashboard');
         }
     }
-
     return view('welcome');
 });
 
 // ====================== AUTH DEFAULT (BREEZE) ======================
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
-// ====================== REGISTO PÚBLICO EMPRESA & ORIENTADOR ======================
+// ====================== REGISTO PÚBLICO (EMPRESA & ORIENTADOR) ======================
 
 Route::middleware('guest')->group(function () {
-    Route::get('/registar-empresa', [EmpresaRegisterController::class, 'create'])
-        ->name('empresa.register.create');
-    Route::post('/registar-empresa', [EmpresaRegisterController::class, 'store'])
-        ->name('empresa.register.store');
+    Route::get('/registar-empresa', [EmpresaRegisterController::class, 'create'])->name('empresa.register.create');
+    Route::post('/registar-empresa', [EmpresaRegisterController::class, 'store'])->name('empresa.register.store');
 
-    Route::get('/registar-orientador', [OrientadorRegisterController::class, 'create'])
-        ->name('orientador.register.create');
-    Route::post('/registar-orientador', [OrientadorRegisterController::class, 'store'])
-        ->name('orientador.register.store');
+    Route::get('/registar-orientador', [OrientadorRegisterController::class, 'create'])->name('orientador.register.create');
+    Route::post('/registar-orientador', [OrientadorRegisterController::class, 'store'])->name('orientador.register.store');
 });
 
-// ====================== VAGAS VISÍVEIS (ALUNO / QUALQUER AUTENTICADO) ======================
+// ====================== VAGAS VISÍVEIS (GERAL / ALUNO) ======================
 
 Route::get('/vagas', [VagaController::class, 'index'])->name('vagas.index');
-
 Route::get('/vagas/{vaga}', [VagaController::class, 'show'])
     ->name('vagas.show')
-    ->whereNumber('vaga'); // garante que 'create' não cai aqui
+    ->whereNumber('vaga');
 
 // ====================== ADMIN ======================
 
@@ -84,14 +74,21 @@ Route::middleware(['auth', 'user_type:admin'])->group(function () {
 Route::middleware(['auth', 'user_type:aluno'])->group(function () {
     Route::get('/aluno', [AlunoController::class, 'index'])->name('aluno.dashboard');
 
+    // Candidaturas
     Route::get('/candidaturas', [CandidaturaController::class, 'index'])->name('candidaturas.index');
     Route::post('/candidatar/{vaga}', [CandidaturaController::class, 'store'])->name('candidaturas.store');
     Route::delete('/candidaturas/{id}', [CandidaturaController::class, 'destroy'])->name('candidaturas.destroy');
 
+    // Escolher Orientador
     Route::get('/candidaturas/{candidatura}/orientador', [AlunoOrientadorController::class, 'create'])
         ->name('aluno.candidaturas.orientador.create');
     Route::post('/candidaturas/{candidatura}/orientador', [AlunoOrientadorController::class, 'store'])
         ->name('aluno.candidaturas.orientador.store');
+
+    // Perfil
+    Route::get('/aluno/perfil', [AlunoController::class, 'perfil'])->name('aluno.perfil');
+    Route::get('/aluno/perfil/editar', [AlunoController::class, 'editarPerfil'])->name('aluno.perfil.editar');
+    Route::post('/aluno/perfil/atualizar', [AlunoController::class, 'atualizarPerfil'])->name('aluno.perfil.atualizar');
 });
 
 // ====================== EMPRESA ======================
@@ -99,23 +96,40 @@ Route::middleware(['auth', 'user_type:aluno'])->group(function () {
 Route::middleware(['auth', 'user_type:empresa'])->group(function () {
     Route::get('/empresa', [EmpresaController::class, 'index'])->name('empresa.dashboard');
 
-    // gestão de vagas (apenas empresa)
+    // Gestão de vagas
     Route::get('/vagas/create', [VagaController::class, 'create'])->name('vagas.create');
     Route::post('/vagas', [VagaController::class, 'store'])->name('vagas.store');
     Route::get('/vagas/{vaga}/edit', [VagaController::class, 'edit'])->name('vagas.edit');
     Route::put('/vagas/{vaga}', [VagaController::class, 'update'])->name('vagas.update');
     Route::delete('/vagas/{vaga}', [VagaController::class, 'destroy'])->name('vagas.destroy');
 
-    // candidaturas às vagas da empresa
+    // Candidaturas recebidas
     Route::get('/empresa/candidaturas', [EmpresaCandidaturaController::class, 'index'])->name('empresa.candidaturas.index');
     Route::post('/empresa/candidaturas/{id}/aceitar', [EmpresaCandidaturaController::class, 'aceitar'])->name('empresa.candidaturas.aceitar');
     Route::post('/empresa/candidaturas/{id}/recusar', [EmpresaCandidaturaController::class, 'recusar'])->name('empresa.candidaturas.recusar');
+
+    
+    // Perfil da Empresa
+    Route::get('/empresa/perfil', [EmpresaController::class, 'perfil'])->name('empresa.perfil');
+    Route::get('/empresa/perfil/editar', [EmpresaController::class, 'editarPerfil'])->name('empresa.perfil.editar');
+    Route::post('/empresa/perfil/atualizar', [EmpresaController::class, 'atualizarPerfil'])->name('empresa.perfil.atualizar');
+
+    // Perfil do Responsável
+    Route::get('/empresa/responsavel', [EmpresaController::class, 'perfilResponsavel'])->name('empresa.responsavel');
+    Route::get('/empresa/responsavel/editar', [EmpresaController::class, 'editarResponsavel'])->name('empresa.responsavel.editar');
+    Route::post('/empresa/responsavel/atualizar', [EmpresaController::class, 'atualizarResponsavel'])->name('empresa.responsavel.atualizar');
+
 });
 
 // ====================== ORIENTADOR ======================
 
 Route::middleware(['auth', 'user_type:orientador'])->group(function () {
     Route::get('/orientador', [OrientadorController::class, 'index'])->name('orientador.dashboard');
+
+    // Perfil
+    Route::get('/orientador/perfil', [OrientadorController::class, 'perfil'])->name('orientador.perfil');
+    Route::get('/orientador/perfil/editar', [OrientadorController::class, 'editarPerfil'])->name('orientador.perfil.editar');
+    Route::post('/orientador/perfil/atualizar', [OrientadorController::class, 'atualizarPerfil'])->name('orientador.perfil.atualizar');
 });
 
 // ====================== FORCE LOGOUT (DEV) ======================

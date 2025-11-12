@@ -86,7 +86,7 @@ class AlunoOrientadorController extends Controller
                 'estado'         => 'ativo',
             ]);
 
-            $candidatura->estado = 'confirmada';
+            $candidatura->estado = 'aceite';
             $candidatura->save();
 
             return redirect()

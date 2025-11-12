@@ -9,12 +9,17 @@ return new class extends Migration {
     {
         Schema::create('candidaturas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('aluno_id')->constrained('users')->onDelete('cascade');
+
+            // Corrigido — agora referencia a tabela "alunos"
+            $table->foreignId('aluno_id')->constrained('alunos')->onDelete('cascade');
+
             $table->foreignId('vaga_id')->constrained('vagas')->onDelete('cascade');
+
+            // Este pode continuar a referenciar "users" se o orientador for um user diretamente
             $table->foreignId('orientador_id')->nullable()->constrained('users')->onDelete('set null');
+
             $table->enum('estado', ['pendente', 'aceite', 'recusada'])->default('pendente');
             $table->timestamps();
-            
         });
     }
 

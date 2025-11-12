@@ -64,38 +64,59 @@
             <!-- Right Side (Dropdown + Logout Button) -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <!-- User Dropdown -->
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()->name }}</div>
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </button>
-                    </x-slot>
+                <div class="ml-3 relative">
+                    <x-dropdown align="right" width="48">
+                        <x-slot name="trigger">
+                            <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
+                                <div>{{ Auth::user()->name }}</div>
+                                <div class="ms-1">
+                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                            </button>
+                        </x-slot>
 
-                    <x-slot name="content">
-                        <!-- Authentication -->
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <x-dropdown-link :href="route('logout')"
-                                onclick="event.preventDefault(); this.closest('form').submit();">
-                                {{ __('Sair') }}
-                            </x-dropdown-link>
-                        </form>
-                    </x-slot>
-                </x-dropdown>
+                        <x-slot name="content">
+                            @php
+                                $tipo = Auth::user()->user_type;
+                            @endphp
 
-                <!-- Logout Button (Visible) -->
-                <form method="POST" action="{{ route('logout') }}" class="ms-4">
-                    @csrf
-                    <button type="submit"
-                        class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-md text-sm transition ease-in-out duration-150">
-                        Sair
-                    </button>
-                </form>
+                            {{-- Link para o perfil conforme o tipo --}}
+                            @if ($tipo === 'aluno')
+                                <x-dropdown-link :href="route('aluno.perfil')">
+                                    {{ __('Perfil') }}
+                                </x-dropdown-link>
+                            @elseif ($tipo === 'empresa')
+                                <x-dropdown-link :href="route('empresa.perfil')">
+                                    {{ __('Perfil da Empresa') }}
+                                </x-dropdown-link>
+                                <x-dropdown-link :href="route('empresa.responsavel')">
+                                    {{ __('Perfil do Responsável') }}
+                                </x-dropdown-link>
+                            @elseif ($tipo === 'orientador')
+                                <x-dropdown-link :href="route('orientador.perfil')">
+                                    {{ __('Perfil') }}
+                                </x-dropdown-link>
+                            @elseif ($tipo === 'admin')
+                                <x-dropdown-link :href="route('admin.dashboard')">
+                                    {{ __('Perfil (Admin)') }}
+                                </x-dropdown-link>
+                            @endif
+
+                            <div class="border-t border-gray-200 dark:border-gray-600 my-1"></div>
+
+                            <!-- Botão para sair -->
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <x-dropdown-link :href="route('logout')"
+                                    onclick="event.preventDefault(); this.closest('form').submit();">
+                                    {{ __('Sair') }}
+                                </x-dropdown-link>
+                            </form>
+                        </x-slot>
+                    </x-dropdown>
+                </div>
             </div>
 
             <!-- Hamburger -->
@@ -148,12 +169,13 @@
             </div>
 
             <div class="mt-3 space-y-1">
-                <form method="POST" action="{{ route('logout') }}">
+                <x-responsive-nav-link :href="route('logout')"
+                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    {{ __('Sair') }}
+                </x-responsive-nav-link>
+
+                <form id="logout-form" method="POST" action="{{ route('logout') }}" class="hidden">
                     @csrf
-                    <x-responsive-nav-link :href="route('logout')"
-                        onclick="event.preventDefault(); this.closest('form').submit();">
-                        {{ __('Sair') }}
-                    </x-responsive-nav-link>
                 </form>
             </div>
         </div>
