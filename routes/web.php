@@ -72,13 +72,7 @@ Route::middleware(['auth', 'user_type:admin'])->group(function () {
     Route::post('/admin/empresas/{empresa}/rejeitar', [\App\Http\Controllers\AdminEmpresaController::class, 'rejeitar'])->name('admin.empresas.rejeitar');
 
 
-<<<<<<< HEAD
     // ALUNOS (Admin)
-=======
-    // Alunos (ex: só listagem e pesquisa – replica o padrão)
-    Route::get('/admin/alunos', [\App\Http\Controllers\AdminAlunoController::class, 'index'])->name('admin.alunos.index');
-
->>>>>>> 770e62dadcdfec38f7fcfd8fe65a6fecf7035852
     Route::get('/admin/alunos',                [\App\Http\Controllers\AdminAlunoController::class, 'index'])->name('admin.alunos.index');
     Route::get('/admin/alunos/create',         [\App\Http\Controllers\AdminAlunoController::class, 'create'])->name('admin.alunos.create');
     Route::post('/admin/alunos',               [\App\Http\Controllers\AdminAlunoController::class, 'store'])->name('admin.alunos.store');
@@ -100,33 +94,14 @@ Route::middleware(['auth', 'user_type:admin'])->group(function () {
 
     // Vagas
     Route::get('/admin/vagas', [\App\Http\Controllers\AdminVagaController::class, 'index'])->name('admin.vagas.index');
-<<<<<<< HEAD
     Route::post('/admin/vagas/{vaga}/fechar', [\App\Http\Controllers\AdminVagaController::class, 'fechar'])->name('admin.vagas.fechar');
     Route::post('/admin/vagas/{vaga}/abrir', [\App\Http\Controllers\AdminVagaController::class, 'abrir'])->name('admin.vagas.abrir');
-=======
-    Route::get('/admin/vagas/{vaga}', [\App\Http\Controllers\AdminVagaController::class, 'show'])->name('admin.vagas.show');
-    Route::post('/admin/vagas/{vaga}/fechar', [\App\Http\Controllers\AdminVagaController::class, 'fechar'])->name('admin.vagas.fechar');
-    Route::post('/admin/vagas/{vaga}/abrir',  [\App\Http\Controllers\AdminVagaController::class, 'abrir'])->name('admin.vagas.abrir');
-
->>>>>>> 770e62dadcdfec38f7fcfd8fe65a6fecf7035852
 
     // Candidaturas
     Route::get('/admin/candidaturas', [\App\Http\Controllers\AdminCandidaturaController::class, 'index'])->name('admin.candidaturas.index');
 
     // Estágios
-<<<<<<< HEAD
     Route::get('/admin/estagios', [\App\Http\Controllers\AdminEstagioController::class, 'index'])->name('admin.estagios.index');
-=======
-    Route::get('/admin/estagios', [\App\Http\Controllers\AdminEstagioController::class, 'index'])
-        ->name('admin.estagios.index');
-    Route::get('/admin/estagios/{estagio}', [\App\Http\Controllers\AdminEstagioController::class, 'show'])
-        ->name('admin.estagios.show');
-
-    Route::post('/admin/estagios/{estagio}/ativar',   [\App\Http\Controllers\AdminEstagioController::class, 'ativar'])->name('admin.estagios.ativar');
-    Route::post('/admin/estagios/{estagio}/concluir', [\App\Http\Controllers\AdminEstagioController::class, 'concluir'])->name('admin.estagios.concluir');
-    Route::post('/admin/estagios/{estagio}/cancelar', [\App\Http\Controllers\AdminEstagioController::class, 'cancelar'])->name('admin.estagios.cancelar');
-    Route::post('/admin/estagios/{estagio}/reabrir',  [\App\Http\Controllers\AdminEstagioController::class, 'reabrir'])->name('admin.estagios.reabrir');
->>>>>>> 770e62dadcdfec38f7fcfd8fe65a6fecf7035852
 
     // Impersonate (entrar como utilizador e voltar)
     Route::post('/admin/impersonate/{user}', [\App\Http\Controllers\AdminUserController::class, 'impersonate'])->name('admin.impersonate');
