@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+        <h2 class="font-semibold text-xl text-gray-200 leading-tight">
             Vagas Disponíveis
         </h2>
     </x-slot>
@@ -9,74 +9,77 @@
         $user = Auth::user();
     @endphp
 
-    <div class="py-6 max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
+    <div class="py-8 max-w-7xl mx-auto sm:px-6 lg:px-8">
+        {{-- Mensagens --}}
+        @if (session('success'))
+            <div class="bg-green-500/20 border border-green-500/50 text-green-300 p-4 mb-6 rounded-xl">
+                {{ session('success') }}
+            </div>
+        @endif
 
-            {{-- Mensagens --}}
-            @if (session('success'))
-                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-3 mb-4 rounded">
-                    {{ session('success') }}
-                </div>
-            @endif
+        @if (session('error'))
+            <div class="bg-red-500/20 border border-red-500/50 text-red-300 p-4 mb-6 rounded-xl">
+                {{ session('error') }}
+            </div>
+        @endif
 
-            @if (session('error'))
-                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-3 mb-4 rounded">
-                    {{ session('error') }}
-                </div>
-            @endif
+        @if (session('warning'))
+            <div class="bg-yellow-500/20 border border-yellow-500/50 text-yellow-300 p-4 mb-6 rounded-xl">
+                {{ session('warning') }}
+            </div>
+        @endif
 
-            @if (session('warning'))
-                <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-3 mb-4 rounded">
-                    {{ session('warning') }}
-                </div>
-            @endif
+        {{-- Lista de vagas --}}
+        @forelse ($vagas as $vaga)
+            <div class="bg-gray-800 border border-gray-700 p-6 rounded-xl shadow-lg mb-4 hover:border-indigo-500/50 transition-colors">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-white mb-2">
+                            {{ $vaga->titulo }}
+                        </h3>
 
-            {{-- Lista de vagas abertas --}}
-            @forelse ($vagas as $vaga)
-                <div class="bg-gray-50 dark:bg-gray-900 p-5 rounded-lg shadow mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                        {{ $vaga->titulo }}
-                    </h3>
+                        <p class="text-gray-300 mb-3">
+                            {{ $vaga->descricao }}
+                        </p>
 
-                    <p class="text-gray-700 dark:text-gray-400 mt-1">
-                        {{ $vaga->descricao }}
-                    </p>
+                        <p class="text-sm text-gray-400">
+                            <span class="font-semibold text-indigo-400">Empresa:</span>
+                            {{ $vaga->empresa->nome ?? $vaga->empresa->user->name ?? 'Desconhecida' }}
+                        </p>
+                    </div>
 
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                        Empresa:
-                        <span class="font-medium">
-                            {{ $vaga->empresa->nome
-                                ?? $vaga->empresa->user->name
-                                ?? 'Desconhecida' }}
-                        </span>
-                    </p>
-
-                    <div class="mt-4 flex items-center gap-3">
-                        {{-- ALUNO: pode candidatar --}}
+                    <div class="ml-4">
                         @if ($user && $user->user_type === 'aluno')
-                            <form action="{{ route('candidaturas.store', $vaga->id) }}" method="POST">
-                                @csrf
-                                <button type="submit"
-                                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-md">
-                                    Candidatar-me
-                                </button>
-                            </form>
+                            @if(in_array($vaga->id, $candidaturasIds ?? []))
+                                <span class="bg-gray-600 text-gray-300 font-semibold px-5 py-2.5 rounded-lg inline-block">
+                                    Já te candidataste
+                                </span>
+                            @else
+                                <form action="{{ route('candidaturas.store', $vaga->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit"
+                                        class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-lg transition">
+                                        Candidatar-me
+                                    </button>
+                                </form>
+                            @endif
                         @endif
 
-                        {{-- (Opcional) ADMIN: ver detalhes --}}
                         @if ($user && $user->user_type === 'admin')
                             <a href="{{ route('vagas.show', $vaga->id) }}"
-                               class="bg-gray-600 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded-md">
+                               class="bg-gray-600 hover:bg-gray-700 text-white font-semibold px-5 py-2.5 rounded-lg transition inline-block">
                                 Ver detalhes
                             </a>
                         @endif
                     </div>
                 </div>
-            @empty
-                <p class="text-gray-600 dark:text-gray-400">
+            </div>
+        @empty
+            <div class="bg-gray-800 border border-gray-700 p-12 rounded-xl text-center">
+                <p class="text-gray-400 text-lg">
                     Não há vagas disponíveis no momento.
                 </p>
-            @endforelse
-        </div>
+            </div>
+        @endforelse
     </div>
 </x-app-layout>

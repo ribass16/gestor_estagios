@@ -1,50 +1,47 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+        <h2 class="font-semibold text-xl text-gray-200 leading-tight">
             As Minhas Candidaturas
         </h2>
     </x-slot>
 
-    {{-- Alertas --}}
-    @if(session('success'))
-        <div
-            x-data="{ show: true }"
-            x-show="show"
-            x-transition
-            x-init="setTimeout(() => show = false, 3000)"
-            class="max-w-4xl mx-auto mt-4 p-4 rounded-md bg-green-100 text-green-800 border border-green-300 text-center shadow-md">
-            {{ session('success') }}
-        </div>
-    @endif
+    <div class="py-8 max-w-7xl mx-auto sm:px-6 lg:px-8">
+        {{-- Alertas --}}
+        @if(session('success'))
+            <div class="bg-green-500/20 border border-green-500/50 text-green-300 p-4 mb-6 rounded-xl">
+                {{ session('success') }}
+            </div>
+        @endif
 
-    @if($errors->any())
-        <div class="max-w-4xl mx-auto mt-4 p-4 rounded-md bg-red-100 text-red-800 border border-red-300 text-center shadow-md">
-            {{ $errors->first() }}
-        </div>
-    @endif
+        @if($errors->any())
+            <div class="bg-red-500/20 border border-red-500/50 text-red-300 p-4 mb-6 rounded-xl">
+                {{ $errors->first() }}
+            </div>
+        @endif
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
+        <div class="bg-gray-800 border border-gray-700 overflow-hidden shadow-lg rounded-xl">
 
-                @if($candidaturas->isEmpty())
-                    <p class="text-gray-600 dark:text-gray-300">
+            @if($candidaturas->isEmpty())
+                <div class="p-12 text-center">
+                    <p class="text-gray-400 text-lg">
                         Ainda não te candidataste a nenhuma vaga.
                     </p>
-                @else
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                </div>
+            @else
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
                         <thead>
-                            <tr class="bg-gray-900/70 text-gray-100">
-                                <th class="px-6 py-3 text-left text-sm font-medium">Título da Vaga</th>
-                                <th class="px-6 py-3 text-left text-sm font-medium">Descrição</th>
-                                <th class="px-6 py-3 text-left text-sm font-medium">Estado</th>
-                                <th class="px-6 py-3 text-left text-sm font-medium">Orientador</th>
-                                <th class="px-6 py-3 text-left text-sm font-medium">Data de Candidatura</th>
-                                <th class="px-6 py-3 text-center text-sm font-medium">Ações</th>
+                            <tr class="bg-gray-900 border-b border-gray-700">
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-300">Título da Vaga</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-300">Descrição</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-300">Estado</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-300">Orientador</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-300">Data</th>
+                                <th class="px-6 py-4 text-center text-sm font-semibold text-gray-300">Ações</th>
                             </tr>
                         </thead>
 
-                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                        <tbody class="divide-y divide-gray-700">
                             @foreach($candidaturas as $candidatura)
                                 @php
                                     $estagio        = $candidatura->estagio;
@@ -52,94 +49,91 @@
                                     $orientadorUser = $orientador?->user;
                                 @endphp
 
-                                <tr class="bg-gray-900/40 text-gray-100">
+                                <tr class="hover:bg-gray-800/50 transition-colors">
                                     {{-- Título --}}
-                                    <td class="px-6 py-4">
+                                    <td class="px-6 py-4 text-white font-medium">
                                         {{ $candidatura->vaga->titulo ?? '-' }}
                                     </td>
 
                                     {{-- Descrição (curta) --}}
-                                    <td class="px-6 py-4">
+                                    <td class="px-6 py-4 text-gray-300">
                                         {{ \Illuminate\Support\Str::limit($candidatura->vaga->descricao ?? '-', 80) }}
                                     </td>
 
                                     {{-- Estado --}}
                                     <td class="px-6 py-4">
                                         @if($candidatura->estado === 'pendente')
-                                            <span class="text-yellow-400 font-semibold">
+                                            <span class="px-3 py-1 bg-yellow-500/20 text-yellow-300 rounded-lg text-sm font-semibold">
                                                 Pendente
                                             </span>
 
                                         @elseif($candidatura->estado === 'aceite' && !$estagio)
-                                            <span class="text-green-400 font-semibold">
-                                                Aceite pela empresa
+                                            <span class="px-3 py-1 bg-green-500/20 text-green-300 rounded-lg text-sm font-semibold">
+                                                Aceite
                                             </span>
 
                                         @elseif($estagio && $orientadorUser)
-                                            <span class="text-emerald-400 font-semibold">
-                                                Estágio confirmado
+                                            <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-lg text-sm font-semibold">
+                                                Confirmado
                                             </span>
 
                                         @elseif($candidatura->estado === 'recusada')
-                                            <span class="text-red-500 font-semibold">
+                                            <span class="px-3 py-1 bg-red-500/20 text-red-300 rounded-lg text-sm font-semibold">
                                                 Recusada
                                             </span>
 
                                         @else
-                                            <span class="text-gray-300">
+                                            <span class="text-gray-400">
                                                 {{ ucfirst($candidatura->estado) }}
                                             </span>
                                         @endif
                                     </td>
 
                                     {{-- Orientador --}}
-                                    <td class="px-6 py-4">
+                                    <td class="px-6 py-4 text-gray-300">
                                         @if($estagio && $orientadorUser)
                                             {{ $orientadorUser->name }}
                                         @elseif($candidatura->estado === 'aceite' && !$estagio)
-                                            <span class="text-xs text-gray-400 italic">
+                                            <span class="text-gray-400 italic text-sm">
                                                 Por escolher
                                             </span>
                                         @else
-                                            -
+                                            <span class="text-gray-500">-</span>
                                         @endif
                                     </td>
 
                                     {{-- Data --}}
-                                    <td class="px-6 py-4">
+                                    <td class="px-6 py-4 text-gray-400 text-sm">
                                         {{ $candidatura->created_at?->format('d/m/Y H:i') ?? '-' }}
                                     </td>
 
                                     {{-- Ações --}}
                                     <td class="px-6 py-4 text-center">
                                         @if($candidatura->estado === 'pendente')
-                                            {{-- Pode cancelar enquanto está pendente --}}
                                             <form method="POST"
                                                   action="{{ route('candidaturas.destroy', $candidatura->id) }}"
                                                   onsubmit="return confirm('Tens a certeza que queres cancelar esta candidatura?')">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit"
-                                                        class="bg-red-600 hover:bg-red-700 text-white font-semibold py-1 px-4 rounded text-sm">
+                                                        class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg text-sm transition">
                                                     Cancelar
                                                 </button>
                                             </form>
 
                                         @elseif($candidatura->estado === 'aceite' && !$estagio)
-                                            {{-- Empresa aceitou e ainda não há estágio → pode escolher orientador --}}
                                             <a href="{{ route('aluno.candidaturas.orientador.create', $candidatura->id) }}"
-                                               class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-1 px-4 rounded text-sm">
+                                               class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg text-sm transition">
                                                 Escolher Orientador
                                             </a>
 
                                         @elseif($estagio && $orientadorUser)
-                                            {{-- Já existe estágio → não pode mudar --}}
-                                            <span class="px-3 py-1 bg-gray-700 text-white rounded text-xs">
+                                            <span class="px-3 py-1 bg-gray-700 text-gray-300 rounded-lg text-xs">
                                                 Orientador escolhido
                                             </span>
 
                                         @else
-                                            <span class="px-3 py-1 bg-gray-600 text-white rounded text-xs">
+                                            <span class="px-3 py-1 bg-gray-700 text-gray-400 rounded-lg text-xs">
                                                 {{ ucfirst($candidatura->estado) }}
                                             </span>
                                         @endif
@@ -148,9 +142,8 @@
                             @endforeach
                         </tbody>
                     </table>
-                @endif
-
-            </div>
+                </div>
+            @endif
         </div>
     </div>
 </x-app-layout>

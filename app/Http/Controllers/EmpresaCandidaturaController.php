@@ -21,9 +21,9 @@ class EmpresaCandidaturaController extends Controller
         }
 
         $candidaturas = Candidatura::with(['vaga', 'aluno.user'])
-            ->whereHas('vaga', function ($q) use ($empresa) {
-                // AGORA sim: vagas.empresa_id = empresas.id
-                $q->where('empresa_id', $empresa->id);
+            ->whereHas('vaga', function ($q) use ($user) {
+                // vagas.empresa_id = users.id (não empresas.id)
+                $q->where('empresa_id', $user->id);
             })
             ->get();
 
@@ -36,8 +36,8 @@ class EmpresaCandidaturaController extends Controller
 
         $candidatura = Candidatura::with('vaga')->findOrFail($id);
 
-        // segurança: só a empresa dona da vaga pode mexer
-        if (!$candidatura->vaga || $candidatura->vaga->empresa_id !== $empresa->id) {
+        // segurança: só a empresa dona da vaga pode mexer (empresa_id = users.id)
+        if (!$candidatura->vaga || $candidatura->vaga->empresa_id !== Auth::id()) {
             abort(403, 'Não podes alterar esta candidatura.');
         }
 
@@ -53,7 +53,7 @@ class EmpresaCandidaturaController extends Controller
 
         $candidatura = Candidatura::with('vaga')->findOrFail($id);
 
-        if (!$candidatura->vaga || $candidatura->vaga->empresa_id !== $empresa->id) {
+        if (!$candidatura->vaga || $candidatura->vaga->empresa_id !== Auth::id()) {
             abort(403, 'Não podes alterar esta candidatura.');
         }
 

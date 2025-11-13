@@ -71,7 +71,18 @@ class VagaController extends Controller
             ->orderByDesc('id')
             ->get();
 
-        return view('vagas.index', compact('vagas'));
+        // Buscar IDs das vagas que o aluno já se candidatou
+        $candidaturasIds = [];
+        if ($user && $user->user_type === 'aluno') {
+            $aluno = \App\Models\Aluno::where('user_id', $user->id)->first();
+            if ($aluno) {
+                $candidaturasIds = \App\Models\Candidatura::where('aluno_id', $aluno->id)
+                    ->pluck('vaga_id')
+                    ->toArray();
+            }
+        }
+
+        return view('vagas.index', compact('vagas', 'candidaturasIds'));
     }
 
     /**

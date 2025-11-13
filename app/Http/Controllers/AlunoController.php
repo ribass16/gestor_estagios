@@ -10,7 +10,34 @@ class AlunoController extends Controller
     public function index()
     {
         $user = Auth::user();
-        return view('aluno.dashboard', compact('user'));
+        $aluno = $user->aluno;
+
+        // Estatísticas
+        $totalCandidaturas = 0;
+        $candidaturasPendentes = 0;
+        $candidaturasAceites = 0;
+        $candidaturasRecusadas = 0;
+
+        if ($aluno) {
+            $candidaturas = \App\Models\Candidatura::where('aluno_id', $aluno->id)->get();
+            $totalCandidaturas = $candidaturas->count();
+            $candidaturasPendentes = $candidaturas->where('estado', 'pendente')->count();
+            $candidaturasAceites = $candidaturas->where('estado', 'aceite')->count();
+            $candidaturasRecusadas = $candidaturas->where('estado', 'recusada')->count();
+        }
+
+        // Vagas disponíveis
+        $vagasDisponiveis = \App\Models\Vaga::where('estado', 'aberta')->count();
+
+        return view('aluno.dashboard', compact(
+            'user',
+            'aluno',
+            'totalCandidaturas',
+            'candidaturasPendentes',
+            'candidaturasAceites',
+            'candidaturasRecusadas',
+            'vagasDisponiveis'
+        ));
     }
 
     public function perfil()

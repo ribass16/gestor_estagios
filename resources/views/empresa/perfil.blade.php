@@ -6,7 +6,7 @@
     </x-slot>
 
     <div class="py-12 flex justify-center">
-        <div class="max-w-4xl w-full bg-gray-800 text-gray-200 shadow-lg rounded-xl p-8 relative">
+        <div class="max-w-6xl w-full bg-gray-800 text-gray-200 shadow-lg rounded-xl p-8 relative">
 
             <!-- Botão Editar -->
             <div class="absolute top-6 right-6">
@@ -35,47 +35,49 @@
 
             <hr class="border-gray-700 my-4">
 
-            <!-- Informações da Empresa -->
-            <div class="mb-6">
-                <h4 class="text-lg font-semibold text-indigo-400 mb-2">Informações da Empresa</h4>
-                <div class="bg-gray-900 p-4 rounded-lg space-y-2">
-                    <p><span class="font-semibold text-gray-300">Nome da Empresa:</span> {{ $empresa->nome ?? '-' }}</p>
-                    <p><span class="font-semibold text-gray-300">Telemóvel:</span> {{ $empresa->telemovel ?? '-' }}</p>
-                    <p><span class="font-semibold text-gray-300">Morada:</span> {{ $empresa->morada ?? '-' }}</p>
-                    <p><span class="font-semibold text-gray-300">Website:</span>
-                        @if(!empty($empresa->website))
-                            <a href="{{ $empresa->website }}" target="_blank" class="text-indigo-400 hover:text-indigo-300 underline">
-                                {{ $empresa->website }}
-                            </a>
-                        @else
-                            -
+            <!-- Layout em 2 Colunas -->
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Coluna Esquerda: Informações -->
+                <div>
+                    <h4 class="text-lg font-semibold text-indigo-400 mb-4">Informações da Empresa</h4>
+                    <div class="bg-gray-900 p-4 rounded-lg space-y-3">
+                        <p><span class="font-semibold text-gray-300">Nome:</span> {{ $empresa->nome ?? '-' }}</p>
+                        <p><span class="font-semibold text-gray-300">Telemóvel:</span> {{ $empresa->telemovel ?? '-' }}</p>
+                        <p><span class="font-semibold text-gray-300">Morada:</span> {{ $empresa->morada ?? '-' }}</p>
+                        <p><span class="font-semibold text-gray-300">Website:</span>
+                            @if(!empty($empresa->website))
+                                <a href="{{ $empresa->website }}" target="_blank" class="text-indigo-400 hover:text-indigo-300 underline">
+                                    {{ $empresa->website }}
+                                </a>
+                            @else
+                                -
+                            @endif
+                        </p>
+                        @if(!empty($empresa->setor))
+                        <p><span class="font-semibold text-gray-300">Setor:</span> {{ $empresa->setor }}</p>
                         @endif
-                    </p>
+                        @if(!empty($empresa->nif))
+                        <p><span class="font-semibold text-gray-300">NIF:</span> {{ $empresa->nif }}</p>
+                        @endif
+                        <p>
+                            <span class="font-semibold text-gray-300">Estado:</span>
+                            <span class="{{ $empresa->estado === 'aprovada' ? 'text-green-400' : ($empresa->estado === 'rejeitada' ? 'text-red-400' : 'text-yellow-400') }}">
+                                {{ ucfirst($empresa->estado) }}
+                            </span>
+                        </p>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Estado da Conta -->
-            <div class="mb-6">
-                <h4 class="text-lg font-semibold text-indigo-400 mb-2">Estado da Conta</h4>
-                <div class="bg-gray-900 p-4 rounded-lg">
-                    <p>
-                        <span class="font-semibold text-gray-300">Estado:</span>
-                        <span class="{{ $empresa->estado === 'aprovada' ? 'text-green-400' : ($empresa->estado === 'rejeitada' ? 'text-red-400' : 'text-yellow-400') }}">
-                            {{ ucfirst($empresa->estado) }}
-                        </span>
-                    </p>
-                </div>
-            </div>
-
-            <!-- Descrição -->
-            <div>
-                <h4 class="text-lg font-semibold text-indigo-400 mb-2">Descrição</h4>
-                <div class="bg-gray-900 p-4 rounded-lg">
-                    @if(!empty($empresa->descricao))
-                        <p class="text-gray-300">{{ $empresa->descricao }}</p>
-                    @else
-                        <p class="italic text-gray-400">Ainda não adicionaste uma descrição para a tua empresa.</p>
-                    @endif
+                <!-- Coluna Direita: Descrição -->
+                <div>
+                    <h4 class="text-lg font-semibold text-indigo-400 mb-4">Descrição</h4>
+                    <div class="bg-gray-900 p-4 rounded-lg">
+                        @if(!empty($empresa->descricao))
+                            <p class="text-gray-300">{{ $empresa->descricao }}</p>
+                        @else
+                            <p class="italic text-gray-400">Ainda não adicionaste uma descrição para a tua empresa.</p>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>

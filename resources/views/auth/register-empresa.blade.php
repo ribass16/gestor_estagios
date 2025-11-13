@@ -39,6 +39,7 @@
                         NIF
                     </label>
                     <input id="nif" name="nif" type="text" maxlength="9" pattern="[0-9]{9}"
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                            class="w-full px-4 py-3 bg-gray-900 border-2 border-gray-700 text-white rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder-gray-500 text-sm"
                            placeholder="123456789"/>
                     @error('nif')
@@ -54,6 +55,7 @@
                         Telemóvel
                     </label>
                     <input id="telemovel" name="telemovel" type="text" maxlength="9" pattern="[0-9]{9}"
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                            class="w-full px-4 py-3 bg-gray-900 border-2 border-gray-700 text-white rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder-gray-500 text-sm"
                            placeholder="912345678"/>
                     @error('telemovel')
@@ -180,6 +182,7 @@
                             Telefone *
                         </label>
                         <input id="contacto_telefone" name="contacto_telefone" type="text" maxlength="9" pattern="[0-9]{9}" required
+                               oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                                class="w-full px-4 py-3 bg-gray-900 border-2 border-gray-700 text-white rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all placeholder-gray-500 text-sm"
                                placeholder="912345678"/>
                         @error('contacto_telefone')

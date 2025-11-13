@@ -46,8 +46,8 @@ class CandidaturaController extends Controller
 
         if ($jaExiste) {
             return redirect()
-                ->route('candidaturas.index')
-                ->with('success', 'Já te candidataste a esta vaga.');
+                ->route('vagas.index')
+                ->with('warning', 'Já te candidataste a esta vaga.');
         }
 
         Candidatura::create([
@@ -56,10 +56,8 @@ class CandidaturaController extends Controller
             'estado' => 'pendente',
         ]);
 
-
-
         return redirect()
-            ->route('candidaturas.index')
+            ->route('vagas.index')
             ->with('success', 'Candidatura submetida com sucesso.');
     }
 
