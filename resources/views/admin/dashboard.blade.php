@@ -16,7 +16,10 @@
                 <div class="text-3xl font-semibold text-white mt-1">{{ $alunosTotal }}</div>
             </a>
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 770e62dadcdfec38f7fcfd8fe65a6fecf7035852
             {{-- Empresas (link certo) --}}
             <a href="{{ route('admin.empresas.index') }}" class="bg-gray-800 rounded-lg p-5 shadow block hover:ring-2 ring-indigo-500">
                 <div class="text-sm text-gray-400">Empresas</div>
@@ -31,12 +34,18 @@
                 <div class="text-xs text-amber-300 mt-1">{{ $orientadoresPendentes }} pendentes</div>
             </a>
 
+<<<<<<< HEAD
             {{-- Vagas Abertas (se não tens uma página admin de vagas, aponta para a lista pública) --}}
             <a href="{{ route('vagas.index') }}" class="bg-gray-800 rounded-lg p-5 shadow block hover:ring-2 ring-indigo-500">
+=======
+            {{-- Vagas Abertas --}}
+            <a href="{{ route('admin.vagas.index') }}" class="bg-gray-800 rounded-lg p-5 shadow block hover:ring-2 ring-indigo-500">
+>>>>>>> 770e62dadcdfec38f7fcfd8fe65a6fecf7035852
                 <div class="text-sm text-gray-400">Vagas Abertas</div>
                 <div class="text-3xl font-semibold text-white mt-1">{{ $vagasAbertas }}</div>
             </a>
 
+<<<<<<< HEAD
             {{-- Estágios Ativos (se criares uma página admin de estágios, troca esta rota) --}}
             <div class="bg-gray-800 rounded-lg p-5 shadow">
                 <div class="text-sm text-gray-400">Estágios Ativos</div>
@@ -94,6 +103,17 @@
                 </div>
             @endif
         </div>
+=======
+            {{-- Estágios  --}}
+            <a href="{{ route('admin.estagios.index') }}" class="bg-gray-800 rounded-lg p-5 shadow block hover:ring-2 ring-indigo-500">
+                <div class="text-sm text-gray-400">Estágios Ativos</div>
+                <div class="text-3xl font-semibold text-white mt-1">{{ $estagiosAtivos }}</div>
+            </a>
+
+        </div>
+
+
+>>>>>>> 770e62dadcdfec38f7fcfd8fe65a6fecf7035852
 
     </div>
 </x-app-layout>
