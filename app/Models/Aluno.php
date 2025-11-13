@@ -22,6 +22,12 @@ class Aluno extends Model
     {
         return $this->hasMany(Candidatura::class);
     }
+
+    public function estagios()
+    {
+        return $this->hasMany(\App\Models\Estagio::class, 'aluno_id');
+    }
+
 }
 
 
