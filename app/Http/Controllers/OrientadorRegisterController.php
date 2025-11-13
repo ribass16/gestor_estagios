@@ -21,7 +21,7 @@ class OrientadorRegisterController extends Controller
             'email'        => ['required', 'email', 'max:255', 'unique:users,email'],
             'password'     => ['required', 'string', 'min:8', 'confirmed'],
             'departamento' => ['nullable', 'string', 'max:255'],
-            'telemovel'    => ['nullable', 'string', 'max:30'],
+            'telemovel'    => ['nullable', 'digits:9'],
         ]);
 
         // cria user como orientador

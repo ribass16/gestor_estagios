@@ -18,15 +18,15 @@ class EmpresaRegisterController extends Controller
     {
         $request->validate([
             'nome_empresa'      => ['required', 'string', 'max:255'],
-            'nif'               => ['nullable', 'string', 'max:20', 'unique:empresas,nif'],
-            'telemovel'         => ['nullable', 'string', 'max:30'],
+            'nif'               => ['nullable', 'digits:9', 'unique:empresas,nif'],
+            'telemovel'         => ['nullable', 'digits:9'],
             'morada'            => ['nullable', 'string', 'max:255'],
             'website'           => ['nullable', 'string', 'max:255'],
             'setor'             => ['nullable', 'string', 'max:255'],
             'descricao'         => ['nullable', 'string'],
             'contacto_nome'     => ['required', 'string', 'max:255'],
             'contacto_email'    => ['required', 'email', 'max:255', 'unique:users,email'],
-            'contacto_telefone' => ['required', 'string', 'max:30'],
+            'contacto_telefone' => ['required', 'digits:9'],
             'password'          => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
