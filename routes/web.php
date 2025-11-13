@@ -98,10 +98,15 @@ Route::middleware(['auth', 'user_type:admin'])->group(function () {
     Route::post('/admin/vagas/{vaga}/abrir', [\App\Http\Controllers\AdminVagaController::class, 'abrir'])->name('admin.vagas.abrir');
 
     // Candidaturas
-    Route::get('/admin/candidaturas', [\App\Http\Controllers\AdminCandidaturaController::class, 'index'])->name('admin.candidaturas.index');
+    // Route::get('/admin/candidaturas', [\App\Http\Controllers\AdminCandidaturaController::class, 'index'])->name('admin.candidaturas.index');
 
     // Estágios
     Route::get('/admin/estagios', [\App\Http\Controllers\AdminEstagioController::class, 'index'])->name('admin.estagios.index');
+    Route::get('/admin/estagios/{estagio}', [\App\Http\Controllers\AdminEstagioController::class, 'show'])->name('admin.estagios.show');
+    Route::post('/admin/estagios/{estagio}/ativar', [\App\Http\Controllers\AdminEstagioController::class, 'ativar'])->name('admin.estagios.ativar');
+    Route::post('/admin/estagios/{estagio}/concluir', [\App\Http\Controllers\AdminEstagioController::class, 'concluir'])->name('admin.estagios.concluir');
+    Route::post('/admin/estagios/{estagio}/cancelar', [\App\Http\Controllers\AdminEstagioController::class, 'cancelar'])->name('admin.estagios.cancelar');
+    Route::post('/admin/estagios/{estagio}/reabrir', [\App\Http\Controllers\AdminEstagioController::class, 'reabrir'])->name('admin.estagios.reabrir');
 
     // Impersonate (entrar como utilizador e voltar)
     Route::post('/admin/impersonate/{user}', [\App\Http\Controllers\AdminUserController::class, 'impersonate'])->name('admin.impersonate');
