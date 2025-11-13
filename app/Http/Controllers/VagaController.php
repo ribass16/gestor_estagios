@@ -23,7 +23,7 @@ class VagaController extends Controller
             abort(403, 'Empresa não encontrada.');
         }
 
-        if ($empresa->estado !== 'aprovado') {
+        if ($empresa->estado !== 'aprovada') {
             return redirect()
                 ->route('empresa.dashboard')
                 ->with('error', 'A tua empresa ainda não foi aprovada. Só podes criar e gerir vagas depois da aprovação.');
@@ -49,7 +49,7 @@ class VagaController extends Controller
                 abort(403, 'Empresa não encontrada.');
             }
 
-            if ($empresa->estado !== 'aprovado') {
+            if ($empresa->estado !== 'aprovada') {
                 $vagas = collect();
                 $pendente = true;
                 return view('empresa.vagas.index', compact('vagas', 'pendente'));

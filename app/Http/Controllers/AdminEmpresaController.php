@@ -29,7 +29,7 @@ class AdminEmpresaController extends Controller
         }
 
         $pendentesCount  = Empresa::where('estado', 'pendente')->count();
-        $aprovadasCount  = Empresa::whereIn('estado', ['aprovada','aprovado'])->count();
+        $aprovadasCount  = Empresa::where('estado', 'aprovada')->count();
         $rejeitadasCount = Empresa::where('estado', 'rejeitada')->count();
 
         $empresas = $baseQuery->orderByDesc('id')->paginate(12)->withQueryString();
