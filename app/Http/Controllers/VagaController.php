@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\Auth;
 class VagaController extends Controller
 {
     /**
-     * Garante que o user autenticado é uma empresa aprovada.
-     * Devolve o registo Empresa ou RedirectResponse se não puder avançar.
+     * Garante que o user autenticado é empresa e que a Empresa está aprovada.
+     * Devolve o modelo Empresa ou um redirect se ainda não puder avançar.
      */
     private function getEmpresaAprovadaOrRedirect()
     {
@@ -23,6 +23,7 @@ class VagaController extends Controller
             abort(403, 'Empresa não encontrada.');
         }
 
+        // na DB usamos 'aprovada' (feminino)
         if ($empresa->estado !== 'aprovada') {
             return redirect()
                 ->route('empresa.dashboard')
@@ -34,7 +35,7 @@ class VagaController extends Controller
 
     /**
      * Listagem de vagas:
-     * - Empresa → Minhas vagas (filtra por users.id)
+     * - Empresa → Minhas vagas (filtra por empresas.id)
      * - Admin   → Todas as vagas
      * - Outros  → Vagas abertas
      */
@@ -55,8 +56,10 @@ class VagaController extends Controller
                 return view('empresa.vagas.index', compact('vagas', 'pendente'));
             }
 
-            // ATENÇÃO: empresa_id em vagas referencia users.id
-            $vagas = Vaga::where('empresa_id', $user->id)->orderByDesc('id')->get();
+            // AGORA: empresa_id referencia empresas.id
+            $vagas = Vaga::where('empresa_id', $empresa->id)
+                ->orderByDesc('id')
+                ->get();
 
             return view('empresa.vagas.index', compact('vagas'));
         }
@@ -71,18 +74,7 @@ class VagaController extends Controller
             ->orderByDesc('id')
             ->get();
 
-        // Buscar IDs das vagas que o aluno já se candidatou
-        $candidaturasIds = [];
-        if ($user && $user->user_type === 'aluno') {
-            $aluno = \App\Models\Aluno::where('user_id', $user->id)->first();
-            if ($aluno) {
-                $candidaturasIds = \App\Models\Candidatura::where('aluno_id', $aluno->id)
-                    ->pluck('vaga_id')
-                    ->toArray();
-            }
-        }
-
-        return view('vagas.index', compact('vagas', 'candidaturasIds'));
+        return view('vagas.index', compact('vagas'));
     }
 
     /**
@@ -113,8 +105,8 @@ class VagaController extends Controller
             'descricao' => ['required', 'string'],
         ]);
 
-        // >>> FK para users.id (dono da empresa)
-        $data['empresa_id'] = Auth::id();
+        // CORREÇÃO: FK para empresas.id (não users.id)
+        $data['empresa_id'] = $empresa->id;
         $data['estado']     = 'aberta';
 
         Vaga::create($data);
@@ -125,7 +117,7 @@ class VagaController extends Controller
     }
 
     /**
-     * Mostrar detalhes de vaga
+     * Mostrar detalhes de vaga (público)
      */
     public function show(Vaga $vaga)
     {
@@ -145,8 +137,8 @@ class VagaController extends Controller
 
         $vaga = Vaga::findOrFail($id);
 
-        // Dono é o user da empresa (FK para users.id)
-        if ($vaga->empresa_id !== Auth::id()) {
+        // Dono: comparar com empresas.id
+        if ((int)$vaga->empresa_id !== (int)$empresa->id) {
             abort(403, 'Acesso negado.');
         }
 
@@ -165,7 +157,7 @@ class VagaController extends Controller
 
         $vaga = Vaga::findOrFail($id);
 
-        if ($vaga->empresa_id !== Auth::id()) {
+        if ((int)$vaga->empresa_id !== (int)$empresa->id) {
             abort(403, 'Acesso negado.');
         }
 
@@ -191,7 +183,7 @@ class VagaController extends Controller
             return $empresa;
         }
 
-        if ($vaga->empresa_id !== Auth::id()) {
+        if ((int)$vaga->empresa_id !== (int)$empresa->id) {
             abort(403, 'Acesso negado.');
         }
 

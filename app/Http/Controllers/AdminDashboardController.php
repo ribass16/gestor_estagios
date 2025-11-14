@@ -24,8 +24,12 @@ class AdminDashboardController extends Controller
         $vagasAbertas          = Vaga::where('estado', 'aberta')->count();
         $estagiosAtivos        = Estagio::where('estado', 'ativo')->count();
 
-        $ultimasCandidaturas   = Candidatura::with(['aluno.user','vaga.empresa'])
-                                   ->latest()->limit(5)->get();
+        $ultimasCandidaturas = Candidatura::with(['aluno.user', 'vaga.empresa'])
+            ->whereHas('vaga')            // só com vaga existente
+            ->latest('id')
+            ->take(5)
+            ->get();
+
 
         return view('admin.dashboard', compact(
             'alunosTotal',

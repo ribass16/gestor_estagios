@@ -94,6 +94,7 @@ Route::middleware(['auth', 'user_type:admin'])->group(function () {
 
     // Vagas
     Route::get('/admin/vagas', [\App\Http\Controllers\AdminVagaController::class, 'index'])->name('admin.vagas.index');
+    Route::get('/admin/vagas/{vaga}', [AdminVagaController::class, 'show'])->name('admin.vagas.show'); // <-- NOVA
     Route::post('/admin/vagas/{vaga}/fechar', [\App\Http\Controllers\AdminVagaController::class, 'fechar'])->name('admin.vagas.fechar');
     Route::post('/admin/vagas/{vaga}/abrir', [\App\Http\Controllers\AdminVagaController::class, 'abrir'])->name('admin.vagas.abrir');
 

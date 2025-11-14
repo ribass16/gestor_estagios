@@ -19,7 +19,7 @@ class Vaga extends Model
 
     public function candidaturas()
     {
-        return $this->hasMany(Candidatura::class, 'vaga_id');
+        return $this->hasMany(\App\Models\Candidatura::class, 'vaga_id');
     }
 
 

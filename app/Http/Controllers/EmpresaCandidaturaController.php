@@ -11,21 +11,18 @@ class EmpresaCandidaturaController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
+        // Empresa do utilizador autenticado
+        $empresa = Empresa::where('user_id', Auth::id())->firstOrFail();
 
-        // Empresa ligada ao utilizador autenticado
-        $empresa = Empresa::where('user_id', $user->id)->first();
-
-        if (!$empresa) {
-            abort(403, 'Empresa não encontrada para este utilizador.');
-        }
-
-        $candidaturas = Candidatura::with(['vaga', 'aluno.user'])
-            ->whereHas('vaga', function ($q) use ($user) {
-                // vagas.empresa_id = users.id (não empresas.id)
-                $q->where('empresa_id', $user->id);
-            })
-            ->get();
+        // Candidaturas para vagas desta empresa (nota: vagas.empresa_id == empresas.id)
+        $candidaturas = Candidatura::with([
+                'vaga:id,titulo,empresa_id',
+                'vaga.empresa:id,nome',
+                'aluno.user:id,name,email',
+            ])
+            ->whereHas('vaga', fn ($q) => $q->where('empresa_id', $empresa->id))
+            ->latest()
+            ->paginate(12);
 
         return view('empresa.candidaturas.index', compact('candidaturas'));
     }
@@ -34,32 +31,25 @@ class EmpresaCandidaturaController extends Controller
     {
         $empresa = Empresa::where('user_id', Auth::id())->firstOrFail();
 
-        $candidatura = Candidatura::with('vaga')->findOrFail($id);
+        $cand = Candidatura::where('id', $id)
+            ->whereHas('vaga', fn ($q) => $q->where('empresa_id', $empresa->id))
+            ->firstOrFail();
 
-        // segurança: só a empresa dona da vaga pode mexer (empresa_id = users.id)
-        if (!$candidatura->vaga || $candidatura->vaga->empresa_id !== Auth::id()) {
-            abort(403, 'Não podes alterar esta candidatura.');
-        }
+        $cand->update(['estado' => 'aceite']);
 
-        $candidatura->estado = 'aceite';
-        $candidatura->save();
-
-        return back()->with('success', 'Candidatura marcada como aceite. Aguarda a escolha do orientador pelo aluno.');
+        return back()->with('success', 'Candidatura aceite.');
     }
 
     public function recusar($id)
     {
         $empresa = Empresa::where('user_id', Auth::id())->firstOrFail();
 
-        $candidatura = Candidatura::with('vaga')->findOrFail($id);
+        $cand = Candidatura::where('id', $id)
+            ->whereHas('vaga', fn ($q) => $q->where('empresa_id', $empresa->id))
+            ->firstOrFail();
 
-        if (!$candidatura->vaga || $candidatura->vaga->empresa_id !== Auth::id()) {
-            abort(403, 'Não podes alterar esta candidatura.');
-        }
+        $cand->update(['estado' => 'rejeitada']);
 
-        $candidatura->estado = 'recusada';
-        $candidatura->save();
-
-        return back()->with('success', 'Candidatura recusada.');
+        return back()->with('success', 'Candidatura rejeitada.');
     }
 }

@@ -17,13 +17,13 @@ class Candidatura extends Model
 
     public function vaga()
     {
-        return $this->belongsTo(Vaga::class);
+        return $this->belongsTo(\App\Models\Vaga::class, 'vaga_id');
     }
-
     public function aluno()
     {
-        return $this->belongsTo(Aluno::class);
+        return $this->belongsTo(\App\Models\Aluno::class, 'aluno_id');
     }
+
 
 
     public function orientador()
