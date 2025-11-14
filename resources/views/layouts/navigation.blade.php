@@ -16,7 +16,9 @@
                             {{ route('orientador.dashboard') }}
                         @endif
                     ">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
+                        <span class="text-2xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">
+                            ISTEC
+                        </span>
                     </a>
                 </div>
 

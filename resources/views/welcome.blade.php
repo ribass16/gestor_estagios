@@ -58,7 +58,7 @@
             <!-- Main Title -->
             <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
                 Sistema de Gestão de
-                <span class="block bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">
+                <span class="block bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 text-transparent bg-clip-text pb-2">
                     Estágios
                 </span>
             </h1>
@@ -89,15 +89,15 @@
             <!-- Stats -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
                 <div class="p-6 bg-gray-800/30 backdrop-blur-lg rounded-lg border border-gray-700/40">
-                    <div class="text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 text-transparent bg-clip-text">100+</div>
+                    <div class="text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 text-transparent bg-clip-text pb-1">{{ $totalEmpresas }}{{ $totalEmpresas > 0 ? '+' : '' }}</div>
                     <div class="text-gray-400 text-sm mt-2">Empresas Parceiras</div>
                 </div>
                 <div class="p-6 bg-gray-800/30 backdrop-blur-lg rounded-lg border border-gray-700/40">
-                    <div class="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text">1000+</div>
+                    <div class="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text pb-1">{{ $totalAlunos }}{{ $totalAlunos > 0 ? '+' : '' }}</div>
                     <div class="text-gray-400 text-sm mt-2">Alunos Registados</div>
                 </div>
                 <div class="p-6 bg-gray-800/30 backdrop-blur-lg rounded-lg border border-gray-700/40">
-                    <div class="text-3xl font-bold bg-gradient-to-r from-pink-400 to-indigo-400 text-transparent bg-clip-text">500+</div>
+                    <div class="text-3xl font-bold bg-gradient-to-r from-pink-400 to-indigo-400 text-transparent bg-clip-text pb-1">{{ $totalEstagios }}{{ $totalEstagios > 0 ? '+' : '' }}</div>
                     <div class="text-gray-400 text-sm mt-2">Estágios Ativos</div>
                 </div>
             </div>

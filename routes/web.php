@@ -15,6 +15,7 @@ use App\Http\Controllers\AdminEmpresaController;
 use App\Http\Controllers\AdminOrientadorController;
 use App\Http\Controllers\OrientadorRegisterController;
 use App\Http\Controllers\AlunoOrientadorController;
+use App\Http\Controllers\WelcomeController;
 
 // ====================== HOME ======================
 
@@ -27,7 +28,7 @@ Route::get('/', function () {
             case 'orientador': return redirect()->route('orientador.dashboard');
         }
     }
-    return view('welcome');
+    return app(WelcomeController::class)->index();
 });
 
 // ====================== AUTH DEFAULT (BREEZE) ======================

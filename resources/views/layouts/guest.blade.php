@@ -11,7 +11,7 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-       
+
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
@@ -32,7 +32,7 @@
                             </svg>
                         </div>
                     </a>
-                    <h1 class="text-xl font-bold text-white">ISTEC</h1>
+                    <h1 class="text-xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 text-transparent bg-clip-text pb-1">ISTEC</h1>
                     <p class="text-xs text-blue-200">Gestão de Estágios</p>
                 </div>
 
